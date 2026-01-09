@@ -28,3 +28,9 @@ Script text is obtained from publicly accessible screenplay repositories and use
 Due to copyright restrictions, raw script text files are not included in this repository.
 
 Analysis outputs include metrics, visualizations, and summaries derived from the text, not the text itself.
+
+---
+
+## Design Notes
+
+Detailed parsing and normalization assumptions are documented in the `notes/` directory.
