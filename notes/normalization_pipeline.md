@@ -132,3 +132,8 @@ The cleaned text is intentionally simple and predictable for downstream parsing.
 - perfect reconstruction of screenplay formatting
 
 These may be explored in later iterations.
+
+---
+
+Run this to not split the words:
+python3 -m scripts.normalize_all --no-split-repair

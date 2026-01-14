@@ -1,1 +1,4 @@
 data/raw/
+.DS_Store
+data/clean/
+data/processed/
