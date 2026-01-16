@@ -67,30 +67,63 @@ def is_character_cue(line: str) -> bool:
     """
     Heuristic (v1):
     - mostly uppercase letters/numbers/spaces/punct
-    - short (by word count and length)
-    - not a scene heading
+    - short
+    - not a scene heading (INT/EXT variants)
     - not a transition
+    - not common beat markers (LATER, CONTINUOUS, etc.)
     """
     s = line.strip()
     if not s:
         return False
+
+    # Hard exclusions
     if is_scene_heading(s) or is_transition(s):
         return False
+
+    # If it looks like a scene heading even with weird spacing, bail out.
+    upper = s.upper()
+    if upper.startswith("INT.") or upper.startswith("EXT.") or upper.startswith("INT./EXT.") or upper.startswith("I/E"):
+        return False
+
     if CHAR_CUE_ALLOWED_RE.match(s) is None:
         return False
-    
+
     words = s.split()
+
+    # Too long to be a cue
     if len(words) > 4:
         return False
     if len(s) > 30:
         return False
 
-    # Avoid treating common non-cue words as cues
-    if s in CHAR_CUE_BLOCKLIST:
+    # Beat markers and common non-speaker tokens that appear as standalone lines
+    blocklist = {
+        "LATER",
+        "MOMENTS LATER",
+        "CONTINUOUS",
+        "SAME",
+        "MORNING",
+        "NIGHT",
+        "DAY",
+        "EVENING",
+        "AFTERNOON",
+        "TITLE",
+    }
+    if upper in blocklist:
         return False
 
-    # Looks cue-like
+    # Title-page / credit lines sometimes come in uppercase; avoid common patterns
+    if "BY " in upper:
+        return False
+
+    # Another guard: cues rarely contain hyphens used like scene headings (" - DAY")
+    if " - " in s:
+        tod = ("DAY", "NIGHT", "MORNING", "EVENING", "AFTERNOON")
+        if upper.endswith(tod):
+            return False
+
     return True
+
 
 
 def strip_character_modifiers(cue_line: str) -> str:
@@ -117,5 +150,9 @@ def boundary_flags(line: str) -> BoundaryFlags:
 
 
 def is_hard_boundary(line: str) -> bool:
-    f = boundary_flags(line)
-    return f.is_blank or f.is_scene_heading or f.is_character_cue or f.is_transition
+    return (
+        is_scene_heading(line)
+        or is_character_cue(line)
+        or is_transition(line)
+    )
+

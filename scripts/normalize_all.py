@@ -28,15 +28,16 @@ def main() -> None:
 
     for path in raw_files:
         raw_text = path.read_text(encoding="utf-8", errors="replace")
-        cleaned, stats = normalize_text(raw_text, enable_split_word_repair=not args.no_split_repair)
+        cleaned, stats = normalize_text(raw_text)
+
 
         out_path = clean_dir / f"{path.stem}_clean.txt"
         out_path.write_text(cleaned, encoding="utf-8")
 
         print(f"\n✅ {path.name} -> {out_path.name}")
         print(f"  lines_in={stats.lines_in} lines_out={stats.lines_out}")
-        print(f"  removed_page_numbers={stats.removed_page_numbers} removed_form_feed_lines={stats.removed_form_feed_lines}")
-        print(f"  merged_lines={stats.merged_lines} split_word_repairs={stats.split_word_repairs}")
+        print(f"  merged_lines={stats.merged_lines}")
+
 
 
 if __name__ == "__main__":
